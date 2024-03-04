@@ -1,110 +1,111 @@
-import * as React from 'react';
-import { render, waitFor, screen } from '@testing-library/react';
-import user from '@testing-library/user-event';
+import * as React from 'react'
+import {render, waitFor, screen} from '@testing-library/react'
+import user from '@testing-library/user-event'
 
-import App from '../app';
-import { submitForm } from '../api';
+import App from '../app'
+import {submitForm} from '../api'
 
 jest.mock('../api', () => ({
-    submitForm: jest.fn().mockResolvedValue({ data: 'response data' }),
-}));
-  
+  submitForm: jest.fn().mockResolvedValue({data: 'response data'}),
+}))
 
-  describe('Integration Test for Multi-Step Form Submission', () => {
-    beforeEach(() => {
-      submitForm.mockResolvedValue({ message: 'Form submitted successfully' });
-    });  
+describe('Integration Test for Multi-Step Form Submission', () => {
+  beforeEach(() => {
+    submitForm.mockResolvedValue({message: 'Form submitted successfully'})
+  })
   //  1 - l'utilisateur est sur la Home
 
-    test('Cas passant ', async () => {
-        render(<App />);
-        
-        // 2 - Un titre "Welcome home" est dans le document
-        expect(screen.getByRole('heading')).toHaveTextContent(/Welcome home/i)
+  test('Cas passant ', async () => {
+    render(<App />)
 
-        // 3 - Un lien "Fill out the form" est dans le document
-        expect(screen.getByRole('link', { name: /Fill out the form/i })).toBeInTheDocument()
+    // 2 - Un titre "Welcome home" est dans le document
+    expect(screen.getByRole('heading')).toHaveTextContent(/Welcome home/i)
 
-        //4 - l'utilisateur clique sur le lien
-        user.click(screen.getByRole('link', { name: /Fill out the form/i }))
+    // 3 - Un lien "Fill out the form" est dans le document
+    expect(
+      screen.getByRole('link', {name: /Fill out the form/i}),
+    ).toBeInTheDocument()
 
-        //5 - l'utilisateur est redirigé sur la page 1
-        //6 - Un titre "Page 1" est dans le document
-        expect(screen.getByRole('heading')).toHaveTextContent(/Page 1/i)
+    //4 - l'utilisateur clique sur le lien
+    user.click(screen.getByRole('link', {name: /Fill out the form/i}))
 
-        //7 - un lien "Go home" est dans le document
-        expect(screen.getByRole('link', { name: /Go home/i })).toBeInTheDocument()
+    //5 - l'utilisateur est redirigé sur la page 1
+    //6 - Un titre "Page 1" est dans le document
+    expect(screen.getByRole('heading')).toHaveTextContent(/Page 1/i)
 
-        //8 - Un champ avec le label "Favorite food" est dans le document
-        expect(screen.getByLabelText(/favorite food/i)).toBeInTheDocument();
+    //7 - un lien "Go home" est dans le document
+    expect(screen.getByRole('link', {name: /Go home/i})).toBeInTheDocument()
 
-        //9 - l'utilisateur rempli le champ avec "Les pâtes"
-        user.type(screen.getByLabelText(/favorite food/i), 'Les pâtes');
+    //8 - Un champ avec le label "Favorite food" est dans le document
+    expect(screen.getByLabelText(/favorite food/i)).toBeInTheDocument()
 
-        //10 - un lien "Next" est dans le document
-        expect(screen.getByRole('link', { name: /Next/i })).toBeInTheDocument()
+    //9 - l'utilisateur rempli le champ avec "Les pâtes"
+    user.type(screen.getByLabelText(/favorite food/i), 'Les pâtes')
 
-        //11 - l'utilisateur clique sur le lien "Next"
-        //12- l'utilisateur est redirigé sur la page 2
-        user.click(screen.getByText('Next'));
+    //10 - un lien "Next" est dans le document
+    expect(screen.getByRole('link', {name: /Next/i})).toBeInTheDocument()
 
-        //13 - Un titre "Page 2" est dans le document
-        expect(screen.getByText('Page 2')).toBeInTheDocument();
+    //11 - l'utilisateur clique sur le lien "Next"
+    //12- l'utilisateur est redirigé sur la page 2
+    user.click(screen.getByText('Next'))
 
-        //14 - un lien "Go back" est dans le document
-        expect(screen.getByRole('link', { name: /Go back/i })).toBeInTheDocument()
+    //13 - Un titre "Page 2" est dans le document
+    expect(screen.getByText('Page 2')).toBeInTheDocument()
 
-        //15 - Un champ avec le label "Favorite drink" est dans le document
-        expect(screen.getByLabelText(/favorite drink/i)).toBeInTheDocument();
+    //14 - un lien "Go back" est dans le document
+    expect(screen.getByRole('link', {name: /Go back/i})).toBeInTheDocument()
 
-        //16 - l'utilisateur rempli le champ avec "Bière"
-        user.type(screen.getByLabelText(/favorite drink/i), 'Bières');
+    //15 - Un champ avec le label "Favorite drink" est dans le document
+    expect(screen.getByLabelText(/favorite drink/i)).toBeInTheDocument()
 
-        //17 - un lien "Review" est dans document
-        expect(screen.getByRole('link', { name: /Review/i })).toBeInTheDocument()
+    //16 - l'utilisateur rempli le champ avec "Bière"
+    user.type(screen.getByLabelText(/favorite drink/i), 'Bières')
 
-        //18 - l'utilisateur clique sur le lien "Review"
-        user.click(screen.getByText(/review/i));
+    //17 - un lien "Review" est dans document
+    expect(screen.getByRole('link', {name: /Review/i})).toBeInTheDocument()
 
-        //19 - l'utilisateur est redirigé sur la page de confirmation
-        //20 - Un titre "Confirm" est dans le document
-        expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
+    //18 - l'utilisateur clique sur le lien "Review"
+    user.click(screen.getByText(/review/i))
 
-        //21 - Un texte "Please confirm your choices" est dans le document
-        expect(screen.getByText(/please confirm your choices/i)).toBeInTheDocument();
+    //19 - l'utilisateur est redirigé sur la page de confirmation
+    //20 - Un titre "Confirm" est dans le document
+    expect(screen.getByRole('button', {name: 'Confirm'})).toBeInTheDocument()
 
-        //22 - Un texte label "favorite food" a pour contenu "Les pâtes"
-        expect(screen.getByText(/les pâtes/i)).toBeInTheDocument();
+    //21 - Un texte "Please confirm your choices" est dans le document
+    expect(screen.getByText(/please confirm your choices/i)).toBeInTheDocument()
 
-        //23 - Un texte label "favorite drink" a pour contenu "Bière"
-        expect(screen.getByText(/bière/i)).toBeInTheDocument();
+    //22 - Un texte label "favorite food" a pour contenu "Les pâtes"
+    expect(screen.getByText(/les pâtes/i)).toBeInTheDocument()
 
-        //24 - un lien "Go back" est dans le document
-        expect(screen.getByRole('link', { name: /Go back/i })).toBeInTheDocument()
+    //23 - Un texte label "favorite drink" a pour contenu "Bière"
+    expect(screen.getByText(/bière/i)).toBeInTheDocument()
 
-        //25 - un bouton "Confirm" est dans le document
-        expect(screen.getByRole('button', { name: /Confirm/i })).toBeInTheDocument()
+    //24 - un lien "Go back" est dans le document
+    expect(screen.getByRole('link', {name: /Go back/i})).toBeInTheDocument()
 
-        //26 - l'utilisateur clique sur le bouton "Confirm"
-        user.click(screen.getByRole('button', { name: 'Confirm' }));
+    //25 - un bouton "Confirm" est dans le document
+    expect(screen.getByRole('button', {name: /Confirm/i})).toBeInTheDocument()
 
-        //27 - l'utilisateur est redirigé sur la page de Félicitation
-        //28 - Un titre "Congrats.You did it." est dans le document
-        await waitFor(() => {
-            expect(screen.getByText("Congrats. You did it.")).toBeInTheDocument();
-          });
+    //26 - l'utilisateur clique sur le bouton "Confirm"
+    user.click(screen.getByRole('button', {name: 'Confirm'}))
 
-        //29 - un lien "Go home" est dans le document
-        expect(screen.getByRole('link', { name: /Go home/i })).toBeInTheDocument()
+    //27 - l'utilisateur est redirigé sur la page de Félicitation
+    //28 - Un titre "Congrats.You did it." est dans le document
+    await waitFor(() => {
+      expect(screen.getByText('Congrats. You did it.')).toBeInTheDocument()
+    })
 
-        //30 - l'utilisateur clique sur le lien "Go Home"
-        user.click(screen.getByText(/go home/i));
-                
-        //31 - l'utilisateur est redirigé sur la home
-        //32 - Un titre "Welcome home" est dans le document
+    //29 - un lien "Go home" est dans le document
+    expect(screen.getByRole('link', {name: /Go home/i})).toBeInTheDocument()
 
-        await waitFor(() => {
-        expect(screen.getByText(/welcome home/i)).toBeInTheDocument();
-        });
-  });
-});
+    //30 - l'utilisateur clique sur le lien "Go Home"
+    user.click(screen.getByText(/go home/i))
+
+    //31 - l'utilisateur est redirigé sur la home
+    //32 - Un titre "Welcome home" est dans le document
+
+    await waitFor(() => {
+      expect(screen.getByText(/welcome home/i)).toBeInTheDocument()
+    })
+  })
+})
